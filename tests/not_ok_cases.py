@@ -179,6 +179,20 @@ case_2h = (
 )
 
 
+case_2i_src = """
+async def async_func(
+    arg1,
+    arg2,
+    arg3,
+):
+    pass
+"""
+case_2i = (
+    case_2i_src, [(3, 4, IND101), (4, 4, IND101), (5, 4, IND101)],
+)
+
+
+
 case_3a_src = """
 def some_func(arg1,
               arg2):
@@ -555,6 +569,7 @@ def collect_all_cases():
         case_2f,
         case_2g,
         case_2h,
+        case_2i,
         case_3a,
         case_4a,
         case_4b,

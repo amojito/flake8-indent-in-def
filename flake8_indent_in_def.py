@@ -38,6 +38,15 @@ class Visitor(ast.NodeVisitor):
         self.violations: List[Tuple[int, int, str]] = []
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        self._visit_function_node(node)
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        self._visit_function_node(node)
+
+    def _visit_function_node(
+            self,
+            node: Union[ast.FunctionDef, ast.AsyncFunctionDef],
+    ) -> None:
         sorted_args, arg_type_lookup, has_star = self._collect_func_args(node)
         if has_star:
             self._visit_node_with_star_in_arg_list(node)
@@ -55,7 +64,7 @@ class Visitor(ast.NodeVisitor):
     @classmethod
     def _collect_func_args(
             cls,
-            node: ast.FunctionDef,
+            node: Union[ast.FunctionDef, ast.AsyncFunctionDef],
     ) -> Tuple[List, Dict[ast.arg, ArgType], bool]:
         """Collect all args from function def; detect presence of * argument"""
         all_args: List[ast.arg] = []
@@ -94,7 +103,7 @@ class Visitor(ast.NodeVisitor):
 
     def _visit_func_args_or_class_bases(
             self,
-            node: Union[ast.FunctionDef, ast.ClassDef],
+            node: Union[ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef],
             args_or_bases: Union[List[ast.arg], List[ast.Name]],
             is_func: bool,
             arg_type_lookup: Optional[Dict[ast.arg, ArgType]] = None,
@@ -185,7 +194,10 @@ class Visitor(ast.NodeVisitor):
 
         return item.col_offset - def_col_offset != expected_indent_
 
-    def _visit_node_with_star_in_arg_list(self, node: ast.FunctionDef) -> None:
+    def _visit_node_with_star_in_arg_list(
+            self,
+            node: Union[ast.FunctionDef, ast.AsyncFunctionDef],
+    ) -> None:
         """
         Within this method, we add '*' as an argument into the node's AST
         structure. Somehow, Python stdlib `ast` omits the standalone '*' when
@@ -212,13 +224,13 @@ class Visitor(ast.NodeVisitor):
                     next_next=next_next_token,
                 ):
                     self._replace_args_field(node, this_token)
-                    self.visit_FunctionDef(node)
+                    self._visit_function_node(node)
                     return  # because there can only be one '*' in the arg list
 
     @classmethod
     def _replace_args_field(
             cls,
-            node: ast.FunctionDef,
+            node: Union[ast.FunctionDef, ast.AsyncFunctionDef],
             token: tokenize.TokenInfo,
     ) -> None:
         star_arg = cls._build_arg_obj(token)

@@ -82,6 +82,16 @@ def some_func(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, a, b, c, d, e, f, 
 """
 
 
+case_2e = """
+async def async_func(
+        arg1,
+        arg2,
+        arg3,
+):
+    pass
+"""
+
+
 case_4a = """
 class MyClass(BaseClassA, BaseClassB, BaseClassC):
     pass
@@ -203,6 +213,7 @@ def collect_all_cases():
         case_2b,
         case_2c,
         case_2d,
+        case_2e,
         case_4a,
         case_4b,
         case_4c,
