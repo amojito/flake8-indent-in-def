@@ -192,7 +192,6 @@ case_2i = (
 )
 
 
-
 case_3a_src = """
 def some_func(arg1,
               arg2):
